@@ -23,7 +23,6 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
 
-
 from ...configuration_utils import PretrainedConfig
 from ...generation import GenerationMixin
 from ...modeling_outputs import BaseModelOutput, Seq2SeqLMOutput

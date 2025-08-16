@@ -23,7 +23,6 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
 
-
 from ...configuration_utils import PretrainedConfig
 from ...generation import GenerationMixin
 from ...modeling_outputs import BaseModelOutput, Seq2SeqLMOutput
@@ -581,18 +580,22 @@ class VisionEncoderDecoderModel(PreTrainedModel, GenerationMixin):
                 shift_labels = original_labels_clone[..., 1:].contiguous()
 
                 loss_fct = CrossEntropyLoss(ignore_index=-100)
-                loss = loss_fct(
-                    shift_logits.view(-1, self.decoder.config.vocab_size),
-                    shift_labels.view(-1)
+                loss = loss_fct(shift_logits.view(-1, self.decoder.config.vocab_size), shift_labels.view(-1))
+
+                loss = self.loss_function(
+                    logits=logits,
+                    labels=labels,
+                    vocab_size=self.decoder.config.vocab_size,
+                    num_items_in_batch=num_items_in_batch,
                 )
             else:
                 if decoder_input_ids is not None:
                     logger.warning(
                         "decoder_input_ids was provided manually. For training, ensure that "
-                    "decoder_input_ids is correctly shifted with respect to labels. "
-                    "Typically it should be: shift_tokens_right(labels, pad_token_id, decoder_start_token_id). "
-                    "If misaligned, this may cause poor training convergence."
-                )
+                        "decoder_input_ids is correctly shifted with respect to labels. "
+                        "Typically it should be: shift_tokens_right(labels, pad_token_id, decoder_start_token_id). "
+                        "If misaligned, this may cause poor training convergence."
+                    )
                 loss = self.loss_function(
                     logits=logits,
                     labels=labels,

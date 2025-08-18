@@ -580,7 +580,7 @@ class VisionEncoderDecoderModel(PreTrainedModel, GenerationMixin):
                 shift_labels = original_labels_clone[..., 1:].contiguous()
 
                 # Renamed from loss_fct for consistency
-                loss_function  = CrossEntropyLoss(ignore_index=-100)
+                loss_function = CrossEntropyLoss(ignore_index=-100)
                 loss = loss_function(shift_logits.view(-1, self.decoder.config.vocab_size), shift_labels.view(-1))
 
             else:

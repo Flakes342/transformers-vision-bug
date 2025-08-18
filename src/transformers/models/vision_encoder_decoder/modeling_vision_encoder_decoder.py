@@ -579,15 +579,10 @@ class VisionEncoderDecoderModel(PreTrainedModel, GenerationMixin):
                 shift_logits = logits[..., :-1, :].contiguous()
                 shift_labels = original_labels_clone[..., 1:].contiguous()
 
-                loss_fct = CrossEntropyLoss(ignore_index=-100)
-                loss = loss_fct(shift_logits.view(-1, self.decoder.config.vocab_size), shift_labels.view(-1))
+                # Renamed from loss_fct for consistency
+                loss_function  = CrossEntropyLoss(ignore_index=-100)
+                loss = loss_function(shift_logits.view(-1, self.decoder.config.vocab_size), shift_labels.view(-1))
 
-                loss = self.loss_function(
-                    logits=logits,
-                    labels=labels,
-                    vocab_size=self.decoder.config.vocab_size,
-                    num_items_in_batch=num_items_in_batch,
-                )
             else:
                 if decoder_input_ids is not None:
                     logger.warning(
@@ -596,6 +591,7 @@ class VisionEncoderDecoderModel(PreTrainedModel, GenerationMixin):
                         "Typically it should be: shift_tokens_right(labels, pad_token_id, decoder_start_token_id). "
                         "If misaligned, this may cause poor training convergence."
                     )
+                # Using existing loss function
                 loss = self.loss_function(
                     logits=logits,
                     labels=labels,
